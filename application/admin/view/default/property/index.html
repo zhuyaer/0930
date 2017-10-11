@@ -3,12 +3,12 @@
 {block name="body"}
 	<!-- 标题栏 -->
 	<div class="main-title">
-		<h2>用户列表</h2>
+		<h2>物业管理</h2>
 	</div>
 	<div class="cf">
 		<div class="fl">
             <a class="btn" href="{:url('add')}">新 增</a>
-			<a class="btn" href="{:url('del')}">删除</a>
+			<button class="btn ajax-post confirm" url="{:url('changeStatus?method=deleteUser')}" target-form="ids">删 除</button>
         </div>
 
         <!-- 高级搜索 -->
@@ -37,8 +37,8 @@
 		</tr>
     </thead>
     <tbody>
-		{notempty name="_list"}
-		{volist name="_list" id="vo"}
+		{notempty name="list"}
+		{volist name="list" id="vo"}
 		<tr>
             <td><input class="ids" type="checkbox" name="id[]" value="{$vo.uid}" /></td>
 			<td>{$vo.id} </td>
@@ -60,10 +60,12 @@
 		{/notempty}
 	</tbody>
     </table>
+	<!-- 分页-->
+	<div class="page">
+		{$_page}
 	</div>
-    <div class="page">
-        {$_page}
     </div>
+
 {/block}
 
 {block name="script"}
@@ -86,6 +88,7 @@
 	//回车搜索
 	$(".search-input").keyup(function(e){
 		if(e.keyCode === 13){
+
 			$("#search").click();
 			return false;
 		}

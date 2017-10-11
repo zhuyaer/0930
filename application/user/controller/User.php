@@ -14,6 +14,9 @@ use app\common\controller\UcApi;
  * 用户控制器
  */
 class User extends Base {
+
+
+
     /**
      * 修改密码提交
      * @author 艺品网络  <twothink.cn>

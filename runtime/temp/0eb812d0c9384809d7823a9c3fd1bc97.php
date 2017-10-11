@@ -1,4 +1,4 @@
-<?php if (!defined('THINK_PATH')) exit(); /*a:2:{s:99:"C:\php\server\Apache24\htdocs\twothink\public/../application/admin/view/default/property\index.html";i:1506699292;s:96:"C:\php\server\Apache24\htdocs\twothink\public/../application/admin/view/default/public\base.html";i:1496373782;}*/ ?>
+<?php if (!defined('THINK_PATH')) exit(); /*a:2:{s:99:"C:\php\server\Apache24\htdocs\twothink\public/../application/admin/view/default/property\index.html";i:1507427663;s:96:"C:\php\server\Apache24\htdocs\twothink\public/../application/admin/view/default/public\base.html";i:1496373782;}*/ ?>
 <!doctype html>
 <html>
 <head>
@@ -102,12 +102,12 @@
             
 	<!-- 标题栏 -->
 	<div class="main-title">
-		<h2>用户列表</h2>
+		<h2>物业管理</h2>
 	</div>
 	<div class="cf">
 		<div class="fl">
             <a class="btn" href="<?php echo url('add'); ?>">新 增</a>
-			<a class="btn" href="<?php echo url('del'); ?>">删除</a>
+			<button class="btn ajax-post confirm" url="<?php echo url('changeStatus?method=deleteUser'); ?>" target-form="ids">删 除</button>
         </div>
 
         <!-- 高级搜索 -->
@@ -136,7 +136,7 @@
 		</tr>
     </thead>
     <tbody>
-		<?php if(!(empty($_list) || (($_list instanceof \think\Collection || $_list instanceof \think\Paginator ) && $_list->isEmpty()))): if(is_array($_list) || $_list instanceof \think\Collection || $_list instanceof \think\Paginator): $i = 0; $__LIST__ = $_list;if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$vo): $mod = ($i % 2 );++$i;?>
+		<?php if(!(empty($list) || (($list instanceof \think\Collection || $list instanceof \think\Paginator ) && $list->isEmpty()))): if(is_array($list) || $list instanceof \think\Collection || $list instanceof \think\Paginator): $i = 0; $__LIST__ = $list;if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$vo): $mod = ($i % 2 );++$i;?>
 		<tr>
             <td><input class="ids" type="checkbox" name="id[]" value="<?php echo $vo['uid']; ?>" /></td>
 			<td><?php echo $vo['id']; ?> </td>
@@ -157,10 +157,12 @@
 		<?php endif; ?>
 	</tbody>
     </table>
+	<!-- 分页-->
+	<div class="page">
+		<?php echo $_page; ?>
 	</div>
-    <div class="page">
-        <?php echo $_page; ?>
     </div>
+
 
         </div>
         <div class="cont-ft">
@@ -277,6 +279,7 @@
 	//回车搜索
 	$(".search-input").keyup(function(e){
 		if(e.keyCode === 13){
+
 			$("#search").click();
 			return false;
 		}

@@ -1,38 +1,111 @@
-{extend name="base/common"/}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>Bootstrap 101 Template</title>
 
-{block name="header"}
-    <header class="jumbotron subhead" id="overview">
-        <div class="container">
-            <h2>源自相同起点，演绎不同精彩！</h2>
-            <p class="lead"></p>
+    <!-- Bootstrap -->
+    <link href="__STATIC__/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="__STATIC__/css/style.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="//cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style>
+        .main{margin-bottom: 60px;}
+        .indexLabel{padding: 10px 0; margin: 10px 0 0; color: #fff;}
+    </style>
+</head>
+<body>
+<div class="main">
+    <!--导航部分-->
+    <nav class="navbar navbar-default navbar-fixed-bottom">
+        <div class="container-fluid text-center">
+            <div class="col-xs-3">
+                <p class="navbar-text"><a href="{:url('index/index')}" class="navbar-link">首页</a></p>
+            </div>
+            <div class="col-xs-3">
+                <p class="navbar-text"><a href="{:url('fuwu/index')}" class="navbar-link">服务</a></p>
+            </div>
+            <div class="col-xs-3">
+                <p class="navbar-text"><a href="{:url('faxian/index')}" class="navbar-link">发现</a></p>
+            </div>
+            <div class="col-xs-3">
+                <p class="navbar-text"><a href="{:url('my/index')}" class="navbar-link">我的</a></p>
+            </div>
         </div>
-    </header>
-{/block}
+    </nav>
+    <!--导航结束-->
 
-{block name="body"}
-    <div class="span9">
-        <!-- Contents
-        ================================================== -->
-        <section id="contents">
-            {article:list name="list" category="$category['id']" child="true"}
-              <div class="row">
-                      <div class="span2">
-                          <a href="{:url('Article/detail?id='.$list['id'])}"><img class="img-thumbnail" src="__ROOT__{$list.cover_id|get_cover_path}" /></a>
-                      </div>
-                      <div class="span7">
-                        <h3><a href="{:url('Article/detail?id='.$list['id'])}">{$list.title}</a></h3>
-                        <p class="lead">{$list.description}</p>
-                          <span><a href="{:url('Article/detail?id='.$list['id'])}">查看全文</a></span>
-                          <span class="pull-right">
-                              <span class="author">{$list.uid|get_username}</span>
-                              <span>于 {$list.create_time|date='Y-m-d H:i',###}</span> 发表在 <span>
-                              <a href="{:url('Article/lists?category='.get_category_name($list['category_id']))}">{$list.category_id|get_category_title}</a></span>
-                              <span>阅读( {$list.view} )</span>&nbsp;&nbsp;
-                          </span>
-                      </div>
-              </div>
-              <hr/>
-            {/article:list}
-        </section>
+    <div class="container-fluid" id="list">
+
+        {volist name="list" id="vo"}
+        <div class="row noticeList">
+            <a href="{:url('article/detail?id='.$vo['id'])}">
+                <div class="col-xs-2">
+                    <img class="noticeImg" src="__ROOT__{$vo.cover_id|get_cover_path}" />
+                </div>
+                <div class="col-xs-10">
+                    <p class="title">{$vo.title}</p>
+                    <p class="intro">{$vo.description}</p>
+                    <p class="info">浏览: {$vo.view} <span class="pull-right">{$list.create_time|date='Y-m-d H:i',###}</span> </p>
+                </div>
+            </a>
+        </div>
+        {/volist}
     </div>
-{/block}
+    <div class="text-center">
+        <input type="hidden" id="category_id" value="{$category_id}">
+        <button type="button" class="btn btn-info ajax-page">获取更多~~~</button>
+    </div>
+</div>
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="__STATIC__/jquery-1.11.2.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="__STATIC__/bootstrap/js/bootstrap.min.js"></script>
+
+<script type="application/javascript">
+    var inner_url = "/index.php/home/article/detail";
+    var p = 1;
+    $(function () {
+        $('.ajax-page').click(function () {
+            p=p+1;
+            var category_id = $('#category_id').val();
+            var url = 'lists?category='+category_id+'&page='+p;
+            $.getJSON(url,function (result) {
+                var data = result.data;
+                console.debug(data);
+                if(!data.length){
+                    $('.ajax-page').html("没有跟多数据了！！").removeClass('ajax-page')
+                }else{
+                    var html="";
+                    $(data).each(function (i,v) {
+
+                        html += '<div class="row noticeList">\
+                    <a class="detail_view" data-id="'+v.id+'"  href="'+inner_url+'/id/'+v.id+'.html">\
+                        <div class="col-xs-2">\
+                            <img class="img-rounded img-responsive" src="'+v.path+'" />\
+                        </div>\
+                        <div class="col-xs-10">\
+                            <p class="title">'+v.title+'</p>\
+                            <p class="intro">'+v.description+'</p>\
+                            <p class="info">浏览:<span class="view"> '+v.view+'</span> <span class="pull-right">'+new Date(parseInt(v.create_time) * 1000).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ")+'</span> </p>\
+                        </div>\
+                    </a>\
+                </div>';
+                    })
+                    $('#list').append(html);
+                }
+            })
+        })
+    });
+</script>
+
+</body>
+</html>

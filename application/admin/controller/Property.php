@@ -15,12 +15,11 @@ class Property extends Admin{
      * 物业管理首页
      * */
     public function index(){
-        $nickname       =   input('nickname');
         $map['status']  =   array('egt',0);
-
-        $list = \think\Db::name('property')->select();
-        $this->assign('_list', $list);
-        $this->assign('meta_title','用户信息');
+       // $list = \think\Db::name('property')->select();
+        $list = $this->lists('Property', $map);
+        $this->assign('list', $list);
+        $this->assign('meta_title','物业管理');
         return $this->fetch();
     }
 
@@ -94,4 +93,5 @@ class Property extends Admin{
             $this->error('删除失败！');
         }
     }
+
 }

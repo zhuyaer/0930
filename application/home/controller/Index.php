@@ -26,7 +26,7 @@ class Index extends Home{
         $this->assign('lists',$lists);//列表
         $this->assign('page',model('Document')->page);//分页
 
-        return $this->fetch();
+        return $this->fetch('index');
     }
 
 }

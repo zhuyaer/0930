@@ -250,7 +250,7 @@ class Admin extends Controller {
      */
     final public function getMenus(){
     	$model_name = $this->request->module();
-    	$controller      = $this->request->controller();
+    	$controller    = $this->request->controller();
     	$action_name = $this->request->action();
     	session('admin_menu_list.'.$controller,null);
         $menus  =   session('admin_menu_list.'.$controller);
@@ -277,56 +277,56 @@ class Admin extends Controller {
 
             // 查找当前子菜单
             $pid = \think\Db::name('Menu')->where("pid !=0 AND url like '%{$controller}/".$action_name."%'")->value('pid');
-            if($pid){
+            if($pid) {
                 // 查找当前主菜单
-                $nav =  \think\Db::name('Menu')->find($pid);
-                if($nav['pid']){
-                    $nav    =   \think\Db::name('Menu')->find($nav['pid']);
+                $nav = \think\Db::name('Menu')->find($pid);
+                if ($nav['pid']) {
+                    $nav = \think\Db::name('Menu')->find($nav['pid']);
                 }
                 foreach ($menus['main'] as $key => $item) {
                     // 获取当前主菜单的子菜单项
-                    if($item['id'] == $nav['id']){
-                        $menus['main'][$key]['class']='current';
+                    if ($item['id'] == $nav['id']) {
+                        $menus['main'][$key]['class'] = 'current';
                         //生成child树
-                        $groups = \think\Db::name('Menu')->where(array('group'=>array('neq',''),'pid' =>$item['id']))->distinct(true)->column("group");
+                        $groups = \think\Db::name('Menu')->where(array('group' => array('neq', ''), 'pid' => $item['id']))->distinct(true)->column("group");
 
                         //获取二级分类的合法url
-                        $where          =   array();
-                        $where['pid']   =   $item['id'];
-                        $where['hide']  =   0;
-                        if(!config('develop_mode')){ // 是否开发者模式
-                            $where['is_dev']    =   0;
+                        $where = array();
+                        $where['pid'] = $item['id'];
+                        $where['hide'] = 0;
+                        if (!config('develop_mode')) { // 是否开发者模式
+                            $where['is_dev'] = 0;
                         }
                         $second_urls = \think\Db::name('Menu')->where($where)->column('id,url');
 
-                        if(!IS_ROOT){
+                        if (!IS_ROOT) {
                             // 检测菜单权限
                             $to_check_urls = array();
-                            foreach ($second_urls as $key=>$to_check_url) {
-                                if( stripos($to_check_url,$model_name)!==0 ){
-                                    $rule = $model_name.'/'.$to_check_url;
-                                }else{
+                            foreach ($second_urls as $key => $to_check_url) {
+                                if (stripos($to_check_url, $model_name) !== 0) {
+                                    $rule = $model_name . '/' . $to_check_url;
+                                } else {
                                     $rule = $to_check_url;
                                 }
-                                if($this->checkRule($rule, AuthRule::rule_url,null))
+                                if ($this->checkRule($rule, AuthRule::rule_url, null))
                                     $to_check_urls[] = $to_check_url;
                             }
                         }
                         // 按照分组生成子菜单树
                         foreach ($groups as $g) {
-                            $map = array('group'=>$g);
-                            if(isset($to_check_urls)){
-                                if(empty($to_check_urls)){
+                            $map = array('group' => $g);
+                            if (isset($to_check_urls)) {
+                                if (empty($to_check_urls)) {
                                     // 没有任何权限
                                     continue;
-                                }else{
+                                } else {
                                     $map['url'] = array('in', $to_check_urls);
                                 }
                             }
-                            $map['pid']     =   $item['id'];
-                            $map['hide']    =   0;
-                            if(!config('develop_mode')){ // 是否开发者模式
-                                $map['is_dev']  =   0;
+                            $map['pid'] = $item['id'];
+                            $map['hide'] = 0;
+                            if (!config('develop_mode')) { // 是否开发者模式
+                                $map['is_dev'] = 0;
                             }
                             $menuList = \think\Db::name('Menu')->where($map)->field('id,pid,title,url,tip')->order('sort asc')->select();
                             $menus['child'][$g] = list_to_tree($menuList, 'id', 'pid', 'operater', $item['id']);
@@ -334,8 +334,10 @@ class Admin extends Controller {
                     }
                 }
             }
+
             session('admin_menu_list.'.$controller,$menus);
         }
+
         return $menus;
     }
 
@@ -437,6 +439,7 @@ class Admin extends Controller {
         $list = $model->where($options['where'])->order($order)->field($field)->paginate($listRows);
         // 获取分页显示
         $page = $list->render();
+
         // 模板变量赋值
         $this->assign('_page', $page);
         $this->assign('_total',$total);

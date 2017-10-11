@@ -8,8 +8,9 @@ use app\home\model\Document;
  */
 class Article extends Home {
 
-    /* 文档模型频道页 */
+//    /* 文档模型频道页 */
 	public function index(){
+
 		/* 分类信息 */
 		$category = $this->category();
 
@@ -18,26 +19,31 @@ class Article extends Home {
 
 		/* 模板赋值并渲染模板 */
 		$this->assign('category', $category);
-		return $this->fetch($category['template_index']);
+
+		//var_dump($category);
+
+		return $this->fetch('index');
 	}
 
+
+
 	/* 文档模型列表页 */
-	public function lists($p = 1){
+	public function lists($category=45, $page=1){
+        $list = Document::where(['category_id'=>$category])->paginate(2);
 
-		/* 分类信息 */
-		$category = $this->category();
-		/* 获取当前分类列表 */
-		$Document = new Document();
-		$list = $Document->lists($category['id']);
-		if(false === $list){
-			$this->error('获取列表数据失败！');
-		}
+        if(Request::instance()->isAjax()){
+            if($list == null){
+                return json(null);
+            }
+           return json($list);
+        }
 
+        $this->assign('category_id', $category);
 		/* 模板赋值并渲染模板 */
-		$this->assign('category', $category);
-		$this->assign('list', $list);
+        $this->assign('list',$list);
+        $this->assign('no',++$page);
 		// echo $category['template_lists'];
-		return $this->fetch($category['template_lists']);
+		return $this->fetch('index');
 	}
 
 	/* 文档模型详情页 */
@@ -74,7 +80,7 @@ class Article extends Home {
 		$this->assign('category', $category);
 		$this->assign('info', $info);
 		$this->assign('page', $p); //页码
-		return $this->fetch($tmpl);
+		return $this->fetch('detail');
 	}
 
 	/* 文档分类检测 */
